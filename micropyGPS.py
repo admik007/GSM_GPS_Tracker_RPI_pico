@@ -1,4 +1,3 @@
-
 """
 # MicropyGPS - a GPS NMEA sentence parser for Micropython/Python 3.X
 # Copyright (c) 2017 Michael Calvin McCoy (calvin.mccoy@protonmail.com)
@@ -74,7 +73,8 @@ class MicropyGPS(object):
         # Data From Sentences
         # Time
         self.timestamp = [0, 0, 0.0]
-        self.date = [0, 0, 0]
+        self.data_string = [0, 0, 0]
+        self.datestamp = [0, 0, 0]
         self.local_offset = local_offset
  
         # Position/Motion
@@ -178,7 +178,18 @@ class MicropyGPS(object):
         """
  
         # UTC Timestamp
+        
         try:
+            data_string = self.gps_segments[9]         
+            if data_string:  # Possible timestamp found
+                year = int(data_string[0:2])
+                month = int(data_string[2:4])
+                day = int(data_string[4:6])
+                self.datestamp = [year, month, day]
+            else:  # No Date stamp yet
+                self.datestamp = [2000, 0, 0]
+            
+            
             utc_string = self.gps_segments[1]
  
             if utc_string:  # Possible timestamp found
@@ -192,6 +203,7 @@ class MicropyGPS(object):
         except ValueError:  # Bad Timestamp value present
             return False
  
+        
         # Check Receiver Data Valid Flag
         if self.gps_segments[2] == 'A':  # Data from Receiver is Valid/Has Fix
  
@@ -811,4 +823,3 @@ class MicropyGPS(object):
  
 if __name__ == "__main__":
     pass
-
